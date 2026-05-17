@@ -4,7 +4,7 @@
 #define TM1637_CLK 4
 #define TM1637_DIO 5
 
-int main() {
+int amain() {
     TM1637 tm(TM1637_CLK, TM1637_DIO);
     tm.set(BRIGHTEST);
 

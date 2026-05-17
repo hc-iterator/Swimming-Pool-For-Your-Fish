@@ -40,7 +40,8 @@ pico_sdk_init()
 # Add executable. Default name is the project name, version 0.1
 
 add_executable(RCCar RCCar.cpp
-        TM1637.cpp )
+        TM1637.cpp
+        Mosfit_Test.cpp )
 
 pico_set_program_name(RCCar "RCCar")
 pico_set_program_version(RCCar "0.1")
