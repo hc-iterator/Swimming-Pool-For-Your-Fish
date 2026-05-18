@@ -1,10 +1,19 @@
 #include <pico/stdlib.h>
 #include "TM1637.h"
+#include "All.h"
 
-#define TM1637_CLK 4
-#define TM1637_DIO 5
+#define TM1637_CLK 2
+#define TM1637_DIO 3
 
-int amain() {
+int main() {
+
+
+    stdio_init_all();
+    sleep_ms(5000);
+    identify_mosfet(N_CHANNEL);
+    while(true);
+
+    /*
     TM1637 tm(TM1637_CLK, TM1637_DIO);
     tm.set(BRIGHTEST);
 
@@ -49,4 +58,6 @@ int amain() {
     }
 
     return 0;
+
+    */
 }
