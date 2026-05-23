@@ -1,31 +1,26 @@
 #include <pico/stdlib.h>
 #include "TM1637.h"
-#include <pico/time.h> 
-#include "All.h"
+#include <stdio.h>
+#include <pico/time.h>  // 引入绝对时间库
 
 #define TM1637_CLK 2
 #define TM1637_DIO 3
 
 int main() {
 
-      /*
     stdio_init_all();
-    sleep_ms(5000);
-    identify_mosfet(N_CHANNEL);
-    while(true);
-
-    */
+    
     TM1637 tm(TM1637_CLK, TM1637_DIO);
     tm.setDigitCount(6);
     tm.set(BRIGHTEST);
 
     int hour = 0, minute = 0, second = 0;
-    int dot_pos = 0;                     // 当前闪烁的小数点位（0‑5）
 
-    absolute_time_t cycle_start = get_absolute_time();   // 记录当前时间作为周期起点
+    // 记录第一个周期的开始时间
+    absolute_time_t cycle_start = get_absolute_time();
 
     while (true) {
-        // 1. 准备本次要显示的数字（HHMMSS）
+        // 1. 准备当前要显示的数字（HHMMSS）
         int8_t data[6];
         data[0] = hour / 10;
         data[1] = hour % 10;
@@ -34,41 +29,29 @@ int main() {
         data[4] = second / 10;
         data[5] = second % 10;
 
-        // 2. 显示数字，所有小数点先灭
-        tm.clearDots();
+        // 2. 显示节奏：无点(250ms) -> 第2、4位点亮(500ms) -> 无点(250ms)
+        
+        // 第一阶段：无点显示，并等待250ms
         tm.display(data);
+        sleep_until(delayed_by_ms(cycle_start, 250)); // 等待到从周期开始算起的第250ms
 
-        // 3. 等待 250 ms（从周期起点算起）
-        absolute_time_t t_dot_on = delayed_by_ms(cycle_start, 250);
-        best_effort_wfe_or_timeout(t_dot_on);
+        // 第二阶段：第2、4位小数点同时点亮，并等待500ms
+        tm.display(data).dot(1).dot(3);
+        sleep_until(delayed_by_ms(cycle_start, 750)); // 等待到从周期开始算起的第750ms
 
-        // 4. 点亮当前闪烁位的小数点
-        tm.setDot(dot_pos, true);
+        // 第三阶段：再次无点显示，并等待剩下的时间
         tm.display(data);
+        // 精确等待到周期结束（从 cycle_start 算起的第 1000ms）
+        sleep_until(delayed_by_ms(cycle_start, 1000));
 
-        // 5. 再等 500 ms（从点亮时刻算起）
-        absolute_time_t t_dot_off = delayed_by_ms(t_dot_on, 500);
-        best_effort_wfe_or_timeout(t_dot_off);
-
-        // 6. 熄灭该位小数点
-        tm.setDot(dot_pos, false);
-        tm.display(data);
-
-        // 7. 等待到下一个周期起点（周期起点 + 1000 ms）
-        absolute_time_t next_cycle = delayed_by_ms(cycle_start, 1000);
-        best_effort_wfe_or_timeout(next_cycle);
-
-        // 8. 更新时间
+        // 3. 更新时间
         second++;
         if (second >= 60) { second = 0; minute++; }
         if (minute >= 60) { minute = 0; hour++; }
         if (hour >= 24)   { hour = 0; }
 
-        // 9. 切换小数点闪烁位置（1→2→…→6→1）
-        dot_pos = (dot_pos + 1) % 6;
-
-        // 10. 当前周期结束，cycle_start 切换到下一周期起点
-        cycle_start = next_cycle;
+        // 4. 为下一个周期设定准确的开始时间
+        cycle_start = delayed_by_ms(cycle_start, 1000);
     }
 
     return 0;
