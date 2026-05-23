@@ -28,7 +28,7 @@ set(PICO_BOARD pico CACHE STRING "Board type")
 # Pull in Raspberry Pi Pico SDK (must be before project)
 include(pico_sdk_import.cmake)
 
-project(RCCar C CXX ASM)
+project(FishTank C CXX ASM)
 
 set(PICO_CXX_ENABLE_EXCEPTIONS 1)
 
@@ -39,31 +39,35 @@ pico_sdk_init()
 
 # Add executable. Default name is the project name, version 0.1
 
-add_executable(RCCar RCCar.cpp
+add_executable(FishTank
+        main.cpp
+        Timer.cpp
         TM1637.cpp
-        Mosfit_Test.cpp )
+        Mosfit_Test.cpp
+)
 
-pico_set_program_name(RCCar "RCCar")
-pico_set_program_version(RCCar "0.1")
+pico_set_program_name(FishTank "FishTank")
+pico_set_program_version(FishTank "0.1")
 
 # Generate PIO header
-pico_generate_pio_header(RCCar ${CMAKE_CURRENT_LIST_DIR}/blink.pio)
+pico_generate_pio_header(FishTank ${CMAKE_CURRENT_LIST_DIR}/blink.pio)
 
 # Modify the below lines to enable/disable output over UART/USB
-pico_enable_stdio_uart(RCCar 1)
-pico_enable_stdio_usb(RCCar 1)
+pico_enable_stdio_uart(FishTank 1)
+pico_enable_stdio_usb(FishTank 1)
 
 # Add the standard library to the build
-target_link_libraries(RCCar
-        pico_stdlib)
+target_link_libraries(FishTank
+        pico_stdlib
+)
 
 # Add the standard include files to the build
-target_include_directories(RCCar PRIVATE
+target_include_directories(FishTank PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}
 )
 
 # Add any user requested libraries
-target_link_libraries(RCCar
+target_link_libraries(FishTank
     hardware_spi
     hardware_gpio
     hardware_i2c
@@ -78,6 +82,4 @@ target_link_libraries(RCCar
     hardware_clocks
 )
 
-
-pico_add_extra_outputs(RCCar)
-
+pico_add_extra_outputs(FishTank)

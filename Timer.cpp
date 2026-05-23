@@ -6,7 +6,7 @@
 #define TM1637_CLK 2
 #define TM1637_DIO 3
 
-int main() {
+int timmermain() {
 
     stdio_init_all();
     
