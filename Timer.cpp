@@ -3,10 +3,10 @@
 #include <stdio.h>
 #include <pico/time.h>  // 引入绝对时间库
 
-#define TM1637_CLK 2
-#define TM1637_DIO 3
+#define TM1637_CLK 3
+#define TM1637_DIO 2
 
-int timmermain() {
+int timermain() {
 
     stdio_init_all();
     
